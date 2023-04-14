@@ -11,15 +11,13 @@ async function create({ name, email, password }: UserCreate): Promise<void> {
 }
 
 async function signin(email: string, password: string): Promise<string> {
-  const { rows: users } = await userRepositories.findByEmail(email);
-  if (users.length === 0) throw invalidCredentialsError();
-  const [user] = users;
+  const user = await userRepositories.findByEmail(email);
+  if (!user) throw invalidCredentialsError();
 
   const passwordOk = await bcrypt.compare(password, user.password);
   if (!passwordOk) throw invalidCredentialsError();
 
-  const secret = process.env.SECRET as string;
-  console.log(secret);
+  const secret = process.env.SECRET_JWT as string;
   const token = jwt.sign({ id: user.id }, secret, {
     expiresIn: 86400,
   });

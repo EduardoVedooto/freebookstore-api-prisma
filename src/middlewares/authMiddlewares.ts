@@ -22,14 +22,12 @@ export const authValidation = (
   const [schema, token] = parts;
   if (schema !== "Bearer") throw unauthorizedError();
 
-  jwt.verify(token, process.env.SECRET, async (error, decoded) => {
+  jwt.verify(token, process.env.SECRET_JWT, async (error, decoded) => {
     try {
       if (error !== null) throw unauthorizedError();
 
       const { id } = decoded as ITokenPayload;
-      const {
-        rows: [user],
-      } = await userRepositories.findById(id);
+      const user = await userRepositories.findById(id);
 
       if (!user) throw unauthorizedError();
 
